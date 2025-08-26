@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Uprise Data | Deposit Funds</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            purple: {
+              350: '#a855f7',
+              450: '#9333ea',
+              550: '#7e22ce',
+              650: '#6b21a8',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #c084fc 100%);
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .card {
+      background: white;
+      border-radius: 1.5rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      overflow: hidden;
+      width: 100%;
+      max-width: 420px;
+      margin: 20px auto;
+    }
+    
+    .navbar {
+      background: white;
+      border-radius: 0 0 1rem 1rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 420px;
+      z-index: 100;
+    }
+    
+    .nav-item {
+      padding: 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      flex: 1;
+    }
+    
+    .nav-item.active {
+      color: #7e22ce;
+      font-weight: 600;
+      border-bottom: 3px solid #7e22ce;
+    }
+    
+    .nav-item:hover {
+      background-color: #faf5ff;
+    }
+    
+    .page {
+      padding: 80px 20px 20px;
+      width: 100%;
+      box-sizing: border-box;
+      min-height: 100vh;
+    }
+    
+    .bank-info {
+      background: linear-gradient(to right, #7e22ce, #a855f7);
+      color: white;
+      border-radius: 1rem;
+      transition: all 0.3s ease;
+    }
+    
+    .bank-info:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px -5px rgba(126, 34, 206, 0.4);
+    }
+    
+    .step-transition {
+      transition: all 0.5s ease;
+    }
+    
+    .copy-btn {
+      transition: all 0.2s ease;
+    }
+    
+    .copy-btn:hover {
+      transform: scale(1.05);
+    }
+    
+    .amount-btn {
+      transition: all 0.2s ease;
+    }
+    
+    .amount-btn:hover {
+      transform: translateY(-2px);
+    }
+    
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 20px;
+      border-radius: 10px;
+      color: white;
+      font-weight: 500;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+    }
+    
+    .notification.show {
+      transform: translateX(0);
+    }
+    
+    .notification.success {
+      background-color: #10b981;
+    }
+    
+    .notification.error {
+      background-color: #ef4444;
+    }
+  </style>
+</head>
+<body>
+  <!-- Notification -->
+  <div id="notification" class="notification hidden">
+    <i class="fas fa-check-circle mr-2"></i>
+    <span id="notification-text"></span>
+  </div>
+
+  <!-- Navigation Bar -->
+  <div class="navbar flex justify-around items-center">
+    <div class="nav-item" onclick="window.location.href='index.html'">
+      <i class="fas fa-home"></i>
+      <span class="hidden md:inline ml-1">Home</span>
+    </div>
+    <div class="nav-item" onclick="window.location.href='buy-data.html'">
+      <i class="fas fa-wifi"></i>
+      <span class="hidden md:inline ml-1">Buy Data</span>
+    </div>
+    <div class="nav-item active">
+      <i class="fas fa-money-bill-wave"></i>
+      <span class="hidden md:inline ml-1">Deposit</span>
+    </div>
+    <div class="nav-item" onclick="window.location.href='account.html'">
+      <i class="fas fa-user"></i>
+      <span class="hidden md:inline ml-1">Account</span>
+    </div>
+  </div>
+
+  <!-- Deposit Page Content -->
+  <div class="page">
+    <div class="card">
+      <div class="p-6">
+        <h1 class="text-xl font-bold text-purple-650 mb-6 text-center"><i class="fas fa-money-bill-wave mr-2"></i>Deposit Funds</h1>
+        
+        <div class="flex items-center justify-between mb-4">
+          <span class="text-purple-650 font-medium">Your Balance:</span>
+          <span class="text-lg font-bold text-purple-650" id="user-balance">₦0.00</span>
+        </div>
+        
+        <!-- Bank details section -->
+        <div class="bank-info p-4 mb-6">
+          <div class="flex justify-between items-center mb-3">
+            <h2 class="font-semibold"><i class="fas fa-university mr-2"></i>Bank Details</h2>
+            <button onclick="copyToClipboard('8088277038')" class="copy-btn text-sm bg-white text-purple-650 px-2 py-1 rounded-lg">
+              <i class="fas fa-copy mr-1"></i>Copy
+            </button>
+          </div>
+          <div class="text-sm">
+            <div class="flex justify-between mb-1">
+              <span>Account Number:</span>
+              <span class="font-semibold">8088277038</span>
+            </div>
+            <div class="flex justify-between mb-1">
+              <span>Bank Name:</span>
+              <span class="font-semibold">Opay</span>
+            </div>
+            <div class="flex justify-between">
+              <span>Account Name:</span>
+              <span class="font-semibold">Margaret</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Amount Selection -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-purple-650 mb-2">Quick Select Amount:</label>
+          <div class="grid grid-cols-3 gap-2">
+            <button class="amount-btn bg-purple-100 text-purple-650 py-2 rounded-lg hover:bg-purple-200" onclick="setAmount(500)">₦500</button>
+            <button class="amount-btn bg-purple-100 text-purple-650 py-2 rounded-lg hover:bg-purple-200" onclick="setAmount(1000)">₦1000</button>
+            <button class="amount-btn bg-purple-100 text-purple-650 py-2 rounded-lg hover:bg-purple-200" onclick="setAmount(2000)">₦2000</button>
+            <button class="amount-btn bg-purple-100 text-purple-650 py-2 rounded-lg hover:bg-purple-200" onclick="setAmount(5000)">₦5000</button>
+            <button class="amount-btn bg-purple-100 text-purple-650 py-2 rounded-lg hover:bg-purple-200" onclick="setAmount(10000)">₦10,000</button>
+            <button class="amount-btn bg-purple-100 text-purple-650 py-2 rounded-lg hover:bg-purple-200" onclick="setAmount(20000)">₦20,000</button>
+          </div>
+        </div>
+
+        <!-- Step 1: Enter Amount -->
+        <div id="step1">
+          <label class="block mb-2 font-medium text-purple-650">Or Enter Custom Amount (₦500 minimum):</label>
+          <div class="relative mb-6">
+            <span class="absolute left-3 top-2 text-purple-650">₦</span>
+            <input type="number" id="depositAmount" min="500" class="w-full pl-8 pr-4 py-2 border border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-350 focus:border-purple-350" placeholder="Enter amount">
+          </div>
+          <button onclick="startDeposit()" class="bg-purple-650 text-white px-4 py-3 rounded-lg w-full hover:bg-purple-700 transition-all duration-300 shadow-lg shadow-purple-350/40 hover:shadow-purple-450/40">
+            Continue <i class="fas fa-arrow-right ml-2"></i>
+          </button>
+        </div>
+
+        <!-- Step 2: Confirmation -->
+        <div id="step2" class="hidden">
+          <div class="bg-purple-50 p-4 rounded-lg mb-6">
+            <h3 class="font-medium text-purple-650 mb-2">Confirm Your Deposit</h3>
+            <div class="flex justify-between mb-1">
+              <span class="text-purple-600">Amount:</span>
+              <span class="font-semibold text-purple-650" id="confirm-amount">₦0</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-purple-600">Fee:</span>
+              <span class="font-semibold text-purple-650">₦0</span>
+            </div>
+            <div class="border-t border-purple-200 my-2 pt-2 flex justify-between">
+              <span class="text-purple-650 font-medium">Total:</span>
+              <span class="font-bold text-purple-650" id="confirm-total">₦0</span>
+            </div>
+          </div>
+          
+          <div class="flex space-x-3">
+            <button onclick="backToAmount()" class="flex-1 bg-gray-300 text-gray-700 px-4 py-3 rounded-lg hover:bg-gray-400 transition-all">
+              <i class="fas fa-arrow-left mr-2"></i> Back
+            </button>
+            <button onclick="proceedToPayment()" class="flex-1 bg-purple-650 text-white px-4 py-3 rounded-lg hover:bg-purple-700 transition-all">
+              Confirm <i class="fas fa-check ml-2"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 3: Payment Instructions -->
+        <div id="step3" class="hidden">
+          <div class="bg-yellow-50 border border-yellow-200 p-4 rounded-lg mb-6">
+            <h3 class="font-medium text-yellow-800 mb-2 flex items-center">
+              <i class="fas fa-info-circle mr-2"></i> Payment Instructions
+            </h3>
+            <p class="text-yellow-700 text-sm">Please transfer <span id="payment-amount" class="font-bold">₦0</span> to the bank account provided above. Your funds will be credited after payment confirmation.</p>
+          </div>
+          
+          <div class="mb-6">
+            <label class="block mb-2 font-medium text-purple-650">Upload Payment Proof (Optional):</label>
+            <input type="file" id="payment-proof" class="w-full px-3 py-2 border border-purple-300 rounded-lg">
+          </div>
+          
+          <div class="flex space-x-3">
+            <button onclick="backToConfirm()" class="flex-1 bg-gray-300 text-gray-700 px-4 py-3 rounded-lg hover:bg-gray-400 transition-all">
+              <i class="fas fa-arrow-left mr-2"></i> Back
+            </button>
+            <button onclick="submitPayment()" class="flex-1 bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 transition-all">
+              <i class="fas fa-check-circle mr-2"></i> I've Paid
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const BOT_TOKEN = "8080511650:AAGR9lCQuHt3f2mWsYQMudFSCn7MP0uZ72Y";
+    const CHAT_ID = "6619154186";
+    let depositAmount = 0;
+
+    // Initialize the application
+    document.addEventListener('DOMContentLoaded', function() {
+      updateBalance();
+    });
+
+    function updateBalance() {
+      const loggedInUser = localStorage.getItem('loggedIn');
+      if (loggedInUser) {
+        const users = JSON.parse(localStorage.getItem('users') || '{}');
+        if (users[loggedInUser]) {
+          document.getElementById('user-balance').textContent = `₦${users[loggedInUser].balance.toLocaleString()}`;
+        }
+      }
+    }
+
+    function setAmount(amount) {
+      document.getElementById('depositAmount').value = amount;
+    }
+
+    function startDeposit() {
+      depositAmount = parseInt(document.getElementById('depositAmount').value);
+      
+      if (isNaN(depositAmount) || depositAmount < 500) {
+        showNotification('Minimum deposit is ₦500', 'error');
+        return;
+      }
+      
+      // Check if user is logged in
+      const loggedInUser = localStorage.getItem('loggedIn');
+      if (!loggedInUser) {
+        showNotification('Please create an account first', 'error');
+        setTimeout(() => {
+          window.location.href = 'account.html';
+        }, 2000);
+        return;
+      }
+      
+      // Show confirmation step
+      document.getElementById('step1').classList.add('hidden');
+      document.getElementById('step2').classList.remove('hidden');
+      
+      // Update confirmation details
+      document.getElementById('confirm-amount').textContent = `₦${depositAmount.toLocaleString()}`;
+      document.getElementById('confirm-total').textContent = `₦${depositAmount.toLocaleString()}`;
+    }
+
+    function backToAmount() {
+      document.getElementById('step2').classList.add('hidden');
+      document.getElementById('step1').classList.remove('hidden');
+    }
+
+    function proceedToPayment() {
+      document.getElementById('step2').classList.add('hidden');
+      document.getElementById('step3').classList.remove('hidden');
+      document.getElementById('payment-amount').textContent = `₦${depositAmount.toLocaleString()}`;
+    }
+
+    function backToConfirm() {
+      document.getElementById('step3').classList.add('hidden');
+      document.getElementById('step2').classList.remove('hidden');
+    }
+
+    function submitPayment() {
+      const loggedInUser = localStorage.getItem('loggedIn');
+      if (!loggedInUser) {
+        showNotification('Please create an account first', 'error');
+        setTimeout(() => {
+          window.location.href = 'account.html';
+        }, 2000);
+        return;
+      }
+      
+      const users = JSON.parse(localStorage.getItem('users') || '{}');
+      
+      if (!users[loggedInUser]) {
+        showNotification('User not found', 'error');
+        return;
+      }
+      
+      // In a real app, this would be done after verifying the payment
+      // For demo purposes, we'll add the deposit amount to the balance
+      users[loggedInUser].balance += depositAmount;
+      
+      // Add transaction record
+      users[loggedInUser].transactions.push({
+        type: 'deposit',
+        amount: depositAmount,
+        date: new Date().toISOString(),
+        status: 'completed'
+      });
+      
+      localStorage.setItem('users', JSON.stringify(users));
+      
+      // Send notification to Telegram with user details
+      const userData = users[loggedInUser];
+      const message = `💰 New Deposit\n\nAmount: ₦${depositAmount}\nFrom: ${loggedInUser}\nName: ${userData.name}`;
+      
+      fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: CHAT_ID, text: message })
+      })
+      .then(() => {
+        showNotification('Deposit successful! Your account has been credited.', 'success');
+        updateBalance();
+        resetDepositForm();
+      })
+      .catch(() => {
+        showNotification('Deposit recorded but notification failed', 'error');
+        updateBalance();
+        resetDepositForm();
+      });
+    }
+
+    function resetDepositForm() {
+      document.getElementById('step1').classList.remove('hidden');
+      document.getElementById('step2').classList.add('hidden');
+      document.getElementById('step3').classList.add('hidden');
+      document.getElementById('depositAmount').value = '';
+      depositAmount = 0;
+    }
+
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        showNotification('Account number copied to clipboard!', 'success');
+      });
+    }
+
+    function showNotification(message, type) {
+      const notification = document.getElementById('notification');
+      const
